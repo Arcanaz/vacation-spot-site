@@ -1,23 +1,46 @@
-import mongoose, { Document, Schema, Model, model } from 'mongoose';
-// const Schema = mongoose.Schema; //Shortens this call to just Schema
+import mongoose, { Document, Schema, Model } from 'mongoose';
+import Review from './review'; // Adjust the import path as needed
 
-interface CampgroundDocument extends Document { //Document is a type from Mongoose
+interface CampgroundDocument extends Document {
     title: string;
-    price: string;
+    price: number;
     description: string;
     location: string;
+    image: string;
+    reviews: mongoose.Types.ObjectId[];
 }
 
 const CampgroundSchema = new Schema<CampgroundDocument>({
     title: { type: String, required: true },
-    price: { type: String, required: true },
-    // description: { type: String, required: true },
-    location: { type: String, required: true }
+    price: { type: Number, required: true },
+    description: { type: String, required: true },
+    location: { type: String, required: true },
+    image: { type: String },
+    reviews: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Review',
+        }
+    ]
 });
 
+// Regular function to ensure correct context
+CampgroundSchema.post('findOneAndDelete', async function(doc) {
+    if (doc) {
+        try {
+            await Review.deleteMany({
+                _id: {
+                    $in: doc.reviews
+                }
+            });
+        } catch (error) {
+            console.error('Error deleting related reviews:', error);
+        }
+    } else {
+        console.log('No Campground found to delete');
+    }
+});
 
-const CampgroundModel: Model<CampgroundDocument> = mongoose.model<CampgroundDocument>('Campground', CampgroundSchema);
+const CampgroundModel = mongoose.model<CampgroundDocument>('Campground', CampgroundSchema);
 
 export default CampgroundModel;
-
-// module.exports = mongoose.model('Campground', CampgroundSchema);
