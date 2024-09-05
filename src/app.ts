@@ -2,35 +2,21 @@ import express, {ErrorRequestHandler, Request, Response, NextFunction} from 'exp
 // import bodyParser from 'body-parser';
 import path from 'path'
 import mongoose from 'mongoose'; //mongoose initializing starts
-import Campground from './models/campground';
+// import Campground from './models/campground';
 import methodOverride from 'method-override';
 import ejsLayouts from 'express-ejs-layouts';
 import {asyncHandler} from './utils/CatchAsync';
 import {ExpressError} from './utils/ExpressErrors'
 import Joi from 'joi'; //havent use this. This is for erro handling
-import Review from './models/review';
+import session from 'express-session';
+import flash from 'connect-flash';
+import campgroundsRouter from './routes/campgrounds';
+import reviewsRouter from './routes/reviews';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import User from './models/user'
+// import User, { UserDocument } from './models/user';
 
-
-interface CampgroundInput {
-    title: string;
-    price: string;
-    description: string;
-    location: string;
-}
-
-// Define a type for the campground data used in responses
-interface CampgroundData {
-    _id: string;
-    title: string;
-    price: string;
-    description: string;
-    location: string;
-}
-
-interface CustomError extends Error {
-    statusCode?: number;
-    message: string;
-}
 
 
 const connectDB = async (): Promise<void> => {
@@ -59,6 +45,35 @@ app.use(methodOverride('_method'));
 
 // app.use(bodyParser.urlencoded({ extended: true }));
 
+const sessionConfig = { //Right click inspect, Applicaitons to see cookies
+    secret: 'thisshouldbeabettersecret',
+    resave: false,
+    saveUninitialized: true, //Eventually we will change to mongostore, not default store that resets session after server restarts
+    cookie: {
+        httpOnly: true, //This is for extra secuirty, but I think its default true already. We are just implicitly saying it
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        maxAge: 1000 * 60 * 60 * 24 * 7
+        //1000 miliseconds  = 1, 60 sec = 1 min, 60 min = 1 hour, 24 hour = 1 day, 7 day = 1 week.
+        //if you do Date.now in console, this is done in miliseconds, so that's we we areusing miliseconds to count time.
+    }
+
+}
+app.use(session(sessionConfig));
+app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session()); //check passport docs. You need this for persistent login sessions.
+//passport.session must be set after app.use(session) above
+passport.use(new LocalStrategy(User.authenticate()));
+
+
+// passport.serializeUser(User.serializeUser() as (user: UserDocument, done: (err: any, id?: any) => void) => void);
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
+
+
+
 
 app.use(ejsLayouts);
 app.set('layout', 'layout/boilerplate');
@@ -69,6 +84,15 @@ app.use((err: ErrorRequestHandler, req: Request, res: Response, next: NextFuncti
     next(err);
 })
 
+app.use((req: Request, res: Response, next: NextFunction) => { 
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+}) // This middleware function is to pass success for flash message. Displayed in boilerplate and run because campgrounds made new campground location entry.
+
+
+app.use('/campgrounds', campgroundsRouter);
+app.use('/campgrounds', reviewsRouter);
 
 
 
@@ -77,110 +101,6 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 
-
-app.get('/test', (req: Request, res: Response) => {
-    res.render('test', { title: 'Test Page' });
-});
-
-
-
-
-app.get('/campgrounds', asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const page = parseInt(req.query.page as string, 10) || 1; // Get page number from query, default to 1
-    const limit = parseInt(req.query.limit as string, 10) || 10; // Get limit from query, default to 10
-
-    // Fetch campgrounds with pagination
-    const campgrounds = await Campground.find({})
-        .skip((page - 1) * limit) // Skip previous pages
-        .limit(limit); // Limit the number of items per page
-
-    const totalCampgrounds = await Campground.countDocuments({}); // Get total count of documents
-
-    res.render('campgrounds/index', {
-        campgrounds,
-        title: 'Campgrounds',
-        currentPage: page,
-        totalPages: Math.ceil(totalCampgrounds / limit) // Calculate total number of pages
-    });
-}));
-
-
-
-
-app.get('/campgrounds/new', asyncHandler(async (req: Request, res: Response) => {
-    res.render('campgrounds/new', { title: 'Create New Campground' });
-}));
-
-
-
-
-app.post('/campgrounds', asyncHandler (async (req: Request, res: Response) => {
-    const campgrounds = new Campground(req.body.campground);
-    await campgrounds.save();
-    res.redirect(`/campgrounds/${campgrounds._id}`)
-}));
-
-app.get('/campgrounds/:id', asyncHandler(async (req: Request, res: Response) => {
-    // if(!req.body.campground) throw new ExpressError('Invalid campground data', 400);
-    // I dont even think I need the code above. This is server side protection, so cant make new campground with stuff like HoppScotch, but maybe my typescript already prevents it.
-    const campground = await Campground.findById(req.params.id).populate('reviews').exec();
-    // console.log(campground);
-    if (campground) {
-        res.render('campgrounds/show', {campground, title: 'CampgroundID'});
-    } else {
-        res.status(404).send('Campground not found');
-    }
-}));
-
-app.post('/campgrounds/:id/reviews', asyncHandler(async (req: Request, res: Response) => {
-    // console.log(req.body);
-    const campground = await Campground.findById(req.params.id);
-    if (!campground) {
-        return res.status(404).json({ message: 'Campground not found' });
-    }
-    const review = new Review(req.body.review);
-    await review.save();
-    campground.reviews.push(review._id); // Push the ObjectId, not the whole document
-    // campground.reviews.push(review._id as mongoose.Types.ObjectId);
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
-}));
-
-
-
-app.get('/campgrounds/:id/edit', asyncHandler (async (req: Request, res: Response) => {
-    const campground = await Campground.findById(req.params.id);
-    if (campground) {
-        res.render('campgrounds/edit', {campground, title: 'Edit'})
-    } else {
-        res.status(404).send('Campground edit cannot be found');
-    } 
-}));
-
-app.put('/campgrounds/:id', asyncHandler (async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const updatedCampground = await Campground.findByIdAndUpdate(id, req.body.campground, { new: true });
-    
-    if (updatedCampground) {
-        res.redirect(`/campgrounds/${updatedCampground._id}`);
-    } else {
-        res.status(404).send('Campground not found');
-    }
-    
-}));
-
-app.delete('/campgrounds/:id', asyncHandler (async (req: Request, res: Response) => {
-    const {id} = req.params;
-    await Campground.findByIdAndDelete(id);
-    res.redirect('/campgrounds')
-}));
-
-app.delete('/campgrounds/:id/reviews/:reviewId', asyncHandler (async (req: Request, res: Response) => {
-    const { id, reviewId} = req.params;
-    Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId }}) //Mongoose $pull allows you to pull from array instead of everything
-    await Review.findByIdAndDelete(req.params.reviewId);
-    res.redirect(`/campgrounds/${id}`)
-}))
 
 
 
