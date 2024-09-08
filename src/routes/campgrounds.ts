@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import Campground from '../models/campground'; // Adjust the path if necessary
 import { asyncHandler } from '../utils/CatchAsync'; // Adjust the path if necessary
 import { ExpressError } from '../utils/ExpressErrors'; // Adjust the path if necessary
+import isLoggedIn from '../middleware/isLoggedIn';
 
 // Define the interface for Campground input data
 interface CampgroundInput {
@@ -43,12 +44,13 @@ router.get('/', asyncHandler(async (req: Request, res: Response): Promise<void> 
 }));
 
 // Route for displaying form to create a new campground
-router.get('/new', asyncHandler(async (req: Request, res: Response) => {
+router.get('/new', isLoggedIn, asyncHandler(async (req: Request, res: Response) => {
     res.render('campgrounds/new', { title: 'Create New Campground' });
 }));
 
 // Route for creating a new campground
-router.post('/', asyncHandler(async (req: Request, res: Response) => {
+//isLoggedIn here, even if user shouldn't even be on the post route, but just extra protection. Maybe against something like Hoppscotch or Postman
+router.post('/', isLoggedIn, asyncHandler(async (req: Request, res: Response) => { 
     const campgroundInput: CampgroundInput = req.body.campground;
     const campground = new Campground(campgroundInput);
     await campground.save();
@@ -69,7 +71,7 @@ router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
 }));
 
 // Route for displaying form to edit a campground
-router.get('/:id/edit', asyncHandler(async (req: Request, res: Response) => {
+router.get('/:id/edit', isLoggedIn, asyncHandler(async (req: Request, res: Response) => {
     const campground = await Campground.findById(req.params.id);
     if (campground) {
         res.render('campgrounds/edit', { campground, title: 'Edit Campground' });
@@ -81,7 +83,7 @@ router.get('/:id/edit', asyncHandler(async (req: Request, res: Response) => {
 }));
 
 // Route for updating a campground
-router.put('/:id', asyncHandler(async (req: Request, res: Response) => {
+router.put('/:id', isLoggedIn, asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const updatedCampground = await Campground.findByIdAndUpdate(id, req.body.campground, { new: true });
     
@@ -94,7 +96,7 @@ router.put('/:id', asyncHandler(async (req: Request, res: Response) => {
 }));
 
 // Route for deleting a campground
-router.delete('/:id', asyncHandler(async (req: Request, res: Response) => {
+router.delete('/:id', isLoggedIn, asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     req.flash('success', 'Successfully deleted campground')

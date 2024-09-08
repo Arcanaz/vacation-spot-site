@@ -10,12 +10,15 @@ import {ExpressError} from './utils/ExpressErrors'
 import Joi from 'joi'; //havent use this. This is for erro handling
 import session from 'express-session';
 import flash from 'connect-flash';
-import campgroundsRouter from './routes/campgrounds';
-import reviewsRouter from './routes/reviews';
+
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import User from './models/user'
 // import User, { UserDocument } from './models/user';
+
+import campgroundRoutes from './routes/campgrounds';
+import reviewRoutes from './routes/reviews';
+import userRoutes from './routes/users';
 
 
 
@@ -68,9 +71,24 @@ passport.use(new LocalStrategy(User.authenticate()));
 
 
 // passport.serializeUser(User.serializeUser() as (user: UserDocument, done: (err: any, id?: any) => void) => void);
-passport.serializeUser(User.serializeUser())
-passport.deserializeUser(User.deserializeUser())
+// passport.serializeUser(User.serializeUser())
+// passport.deserializeUser(User.deserializeUser())
 
+// Serialize the user
+passport.serializeUser((user: Express.User, done: (err: any, id?: any) => void) => {
+    done(null, (user as any)._id); // Assumes the user has _id as the unique identifier
+});
+
+// Deserialize the user
+
+passport.deserializeUser(async (id: string, done: (err: any, user?: Express.User | null) => void) => {
+    try {
+        const user = await User.findById(id).exec();
+        done(null, user);
+    } catch (err) {
+        done(err);
+    }
+});
 
 
 
@@ -85,14 +103,16 @@ app.use((err: ErrorRequestHandler, req: Request, res: Response, next: NextFuncti
 })
 
 app.use((req: Request, res: Response, next: NextFunction) => { 
+    console.log(req.session)
+    res.locals.currentUser = req.user; //req.user comes method within passport. Instead of putting this in isLoggedIn and try for every request, we add it here to the global variables.
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
 }) // This middleware function is to pass success for flash message. Displayed in boilerplate and run because campgrounds made new campground location entry.
 
-
-app.use('/campgrounds', campgroundsRouter);
-app.use('/campgrounds', reviewsRouter);
+app.use('/', userRoutes);
+app.use('/campgrounds', campgroundRoutes);
+app.use('/campgrounds', reviewRoutes);
 
 
 
@@ -100,28 +120,29 @@ app.get('/', (req: Request, res: Response) => {
     res.render('home', { title: 'Home' });
 });
 
-
-
-
-
-
-
-
-
-
-
-app.use('*', (req: Request, res: Response, next: NextFunction) => {
-    next(new ExpressError('Page not found', 404))
+//delete this shit
+app.get('/fakeUser', async(req: Request, res: Response) => {
+    const user = new User({email: 'jgmaximum@gmail.com', username: 'arc'})
+    const newUser = await User.register(user, 'chicken');
+    res.send(newUser);
 })
 
 
+//MAKE SURE TO TURN BACK THESE ROUTES ON///
 
-// I think this sends stuff to console, not for people to see
-app.use((err: ExpressError, req: Request, res: Response, next: NextFunction) => {
-    const {statusCode = 500} = err;
-    if(!err.message) err.message = 'Oh no Something went wrong' //dont know if this works, but this is an error for something besides page not found
-    res.status(statusCode).render('error', {title: 'Error Occured'})
-});
+
+// app.use('*', (req: Request, res: Response, next: NextFunction) => {
+//     next(new ExpressError('Page not found', 404))
+// })
+
+
+
+// // I think this sends stuff to console, not for people to see
+// app.use((err: ExpressError, req: Request, res: Response, next: NextFunction) => {
+//     const {statusCode = 500} = err;
+//     if(!err.message) err.message = 'Oh no Something went wrong' //dont know if this works, but this is an error for something besides page not found
+//     res.status(statusCode).render('error', {title: 'Error Occured'})
+// });
 
 
 

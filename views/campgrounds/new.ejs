@@ -19,13 +19,19 @@
                         Please enter a title.
                     </div>
                 </div>
+
+                <!-- Price input with dollar sign -->
                 <div class="mb-3">
                     <label class="form-label" for="price">Price</label>
-                    <input class="form-control" type="number" id="price" name="campground[price]" required>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input class="form-control" type="number" id="price" name="campground[price]" required>
+                    </div>
                     <div class="invalid-feedback">
                         Please enter a price.
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label" for="location">Location</label>
                     <input class="form-control" type="text" id="location" name="campground[location]" required>
@@ -33,15 +39,15 @@
                         Please enter a location.
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label" for="image">Image URL (optional)</label>
                     <input class="form-control" type="text" id="imageURL" name="campground[image]">
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label" for="description">Description</label>
-                    <textarea class="form-control" id="description" name="campground[description]" rows="4" cols="50"
-                        required>
-                    </textarea>
+                    <textarea class="form-control" id="description" name="campground[description]" rows="4" cols="50" required></textarea>
                     <div class="invalid-feedback">
                         Please enter a description.
                     </div>
@@ -55,8 +61,6 @@
             </form>
         </div>
     </div>
-
-
 </body>
 
 </html>
