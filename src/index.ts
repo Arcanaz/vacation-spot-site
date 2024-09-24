@@ -24,20 +24,12 @@ connectDB();
 const sampleName = (array: string[]): string =>
     array[Math.floor(Math.random() * array.length)];
 
-// Read image URLs from file
-const readImageUrls = (filePath: string): string[] => {
-    try {
-        const data = fs.readFileSync(filePath, 'utf8');
-        return data.split('\n').filter(url => url.trim() !== '');
-    } catch (error) {
-        console.error('Error reading image URLs:', error);
-        return [];
-    }
-};
-
-// Path to your txt file
-const imageUrlsPath = path.resolve(__dirname, '../img/imgurl.txt');
-const imageUrls = readImageUrls(imageUrlsPath);
+// Get all image files from the img directory
+const imageDirectory = path.resolve(__dirname, '../img');
+const imageFiles = fs.readdirSync(imageDirectory).filter(file => {
+    // Only select files with a .jpg, .jpeg, or .png extension
+    return file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.png');
+});
 
 // Function to seed the database
 const seedDB = async () => {
@@ -46,11 +38,13 @@ const seedDB = async () => {
     // Generate and save 25 campgrounds
     for (let i = 0; i < 25; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
+        const randomImage = imageFiles[Math.floor(Math.random() * imageFiles.length)];
         const camp = new Campground({
+            author: '66dd9da17d69da0fd8d02d23', //if you delete author with username 'a', redo this.
             title: `${sampleName(descriptors)} ${sampleName(places)}`,
             price: (Math.random() * 100).toFixed(2),
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            image: imageUrls[Math.floor(Math.random() * imageUrls.length)], // Use a random image URL
+            image: `/img/${randomImage}`, // Use a random image from the folder
             description: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Inventore aliquid in iure. Asperiores, iure? Voluptatum error nulla, atque accusantium quis, voluptatibus, temporibus aliquam vitae sed ullam ratione! Eos, exercitationem totam. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Hic iure ut, cupiditate error eum reprehenderit, consectetur quisquam deserunt corrupti ea exercitationem explicabo voluptas obcaecati, deleniti esse id sint laboriosam. Modi?'
         });
         await camp.save();

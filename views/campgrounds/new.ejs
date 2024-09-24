@@ -11,7 +11,7 @@
     <div class="row">
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
-            <form action="/campgrounds" method="POST" novalidate class="validated-form">
+            <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
                     <input class="form-control" type="text" id="title" name="campground[title]" required>
@@ -25,7 +25,7 @@
                     <label class="form-label" for="price">Price</label>
                     <div class="input-group">
                         <span class="input-group-text">$</span>
-                        <input class="form-control" type="number" id="price" name="campground[price]" required>
+                        <input class="form-control" type="number" id="price" name="campground[price]" required step="0.01">
                     </div>
                     <div class="invalid-feedback">
                         Please enter a price.
@@ -40,14 +40,27 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <!-- <div>
+                    <input type="file" name="campground[images]" id="" required multiple>
+                </div> -->
+
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" name="campground[images]" id="inputGroupFile02" multiple>
+                    <label class="input-group-text" for="inputGroupFile02">Upload</label>
+                </div>
+
+
+
+
+                <!-- <div class="mb-3">
                     <label class="form-label" for="image">Image URL (optional)</label>
                     <input class="form-control" type="text" id="imageURL" name="campground[image]">
-                </div>
+                </div> -->
 
                 <div class="mb-3">
                     <label class="form-label" for="description">Description</label>
-                    <textarea class="form-control" id="description" name="campground[description]" rows="4" cols="50" required></textarea>
+                    <textarea class="form-control" id="description" name="campground[description]" rows="4" cols="50"
+                        required></textarea>
                     <div class="invalid-feedback">
                         Please enter a description.
                     </div>
@@ -61,6 +74,25 @@
             </form>
         </div>
     </div>
+
+        <!-- Add your script here
+        <script>
+            document.querySelector('form').addEventListener('submit', function() {
+                console.log('Form submitted');
+            });
+        </script> -->
+
+        <script>
+            document.querySelector('form').addEventListener('submit', function(event) {
+                // Disable the submit button
+                const submitButton = event.target.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...'; // Optional: Change button text
+        
+                console.log('Form submitted');
+            });
+        </script>
+        
 </body>
 
 </html>

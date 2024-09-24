@@ -5,12 +5,14 @@ interface CampgroundDocument extends Document {
     body: string;  // Use lowercase 'string' for TypeScript types
     rating: number; // Use lowercase 'number' for TypeScript types
     _id: mongoose.Types.ObjectId;  // Explicitly define _id
+    author: mongoose.Types.ObjectId;
 }
 
 // Correcting the Mongoose schema type definition
 const reviewSchema = new Schema<CampgroundDocument>({
     body: { type: String, required: true },   // Use capitalized 'String' for Mongoose types
     rating: { type: Number, required: true }, // Use capitalized 'Number' for Mongoose types
+    author: {type: Schema.Types.ObjectId, ref: 'User'}
     
 });
 

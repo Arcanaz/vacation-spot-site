@@ -2,7 +2,12 @@ import mongoose, { Schema } from 'mongoose';
 import passportLocalMongoose from 'passport-local-mongoose';
 
 // No need to manually extend Passport types, let passport-local-mongoose handle it
-interface UserDocument extends mongoose.PassportLocalDocument {
+// interface UserDocument extends mongoose.PassportLocalDocument {
+//     email: string;
+//     username: string;
+// }
+
+interface UserDocument extends Document {
     email: string;
     username: string;
 }
