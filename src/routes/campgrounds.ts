@@ -17,7 +17,7 @@ import campgrounds, {
 
 import multer from 'multer';
 const upload = multer({ dest: path.join(__dirname, 'temp_uploads') });
-console.log(`HERE!!!!!!!!!!!!!!!!!!!!${__dirname}`);
+console.log(`HERE!!!!!!!!!!!!!!!!!!!!${__dirname}`); //location of your saved images. change this eventually. we dont want multer doing this
 
 
 // import {storage} from '../cloudinary'

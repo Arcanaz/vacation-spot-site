@@ -42,10 +42,14 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
 export const renderLogin = (req: Request, res: Response) => {
     res.render('users/login', {title: 'login'});
+    console.log(`renderLogin -- ${req.session.returnTo}`)
 
 }
 
+//~~~~ THE ISSUE WITH SESSIONS IS HERE ~~~~
+// req.session.returnTo is undefined here, and not in previous login.
 export const login = (req: Request, res: Response, next: NextFunction) => {
+    console.log(`login -- ${req.session.returnTo}`)
     req.flash('success', 'welcome back');
     // console.log('Before everything:', req.session.returnTo);
     // console.log('Before saving session:', req.session);

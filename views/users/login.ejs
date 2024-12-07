@@ -1,19 +1,46 @@
-<h1>Login</h1>
-<form action="/login" class="validated-form" novalidate method="POST">
-    <div class="mb-3">
-        <label class="form-label" for="username">Username</label>
-        <input class="form-control" type="text" id="username" name="username" required>
-        <div class="invalid-feedback">
-            Looks good
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="/stylesheets/login_register.css">
+</head>
+
+<body>
+    <div class="container d-flex justify-content-center align-items-center mt-5">
+        <div class="row">
+            <div class="col-md-12 offset-md-1">
+                <div class="card shadow">
+                    <h3>Login</h3>
+                    <form action="/login" class="validated-form" novalidate method="POST">
+                        <div class="mb-3">
+                            <label class="form-label" for="username">Username</label>
+                            <input class="form-control" type="text" id="username" name="username" required>
+                            <div class="invalid-feedback">
+                                Looks good
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="password">Password</label>
+                            <input class="form-control" type="password" id="password" name="password" required>
+                            <div class="invalid-feedback">
+                                Looks good
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-block w-100">Login</button>
+
+                    </form>
+                </div>
+
+            </div>
+
         </div>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-control" type="password" id="password" name="password" required>
-        <div class="invalid-feedback">
-            Looks good
-        </div>
-    </div>
-    <button clas="btn button-success">Login</button>
-</form>
+</body>
+
+</html>

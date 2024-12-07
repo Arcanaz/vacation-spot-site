@@ -4,8 +4,6 @@ if(process.env.NODE_ENV !== "production"){
 // console.log(process.env.CLOUDINARY_CLOUD_NAME)
 // console.log(process.env.CLOUDNINARY_KEY)
 
-
-
 import express, {ErrorRequestHandler, Request, Response, NextFunction} from 'express';
 // import bodyParser from 'body-parser';
 import path from 'path'
@@ -30,11 +28,19 @@ import userRoutes from './routes/users';
 
 import MongoStore from 'connect-mongo'; //session store
 
+import mongoSanitize from 'express-mongo-sanitize'; //this is to prevent illegal characters to be put into mongo like $gt. Prevents cross-side-scripting
 
+const dbUrl: string | undefined = process.env.DB_URL;
+
+if (!dbUrl) {
+    throw new Error('DB_URL environment variable is not defined.');
+}
 
 const connectDB = async (): Promise<void> => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+        // 'mongodb://localhost:27017/yelp-camp' 
+        //was this before for local
+        await mongoose.connect(dbUrl, {
             // You can specify additional options here if needed
         });
         console.log('Database connected');
@@ -58,6 +64,8 @@ app.use(express.static('public')); //for stars css
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'));
 
+app.use(mongoSanitize()); //This is express-mongo-sanitize
+
 // app.use(bodyParser.urlencoded({ extended: true }));
 
 // const sessionConfig = { //Right click inspect, Applicaitons to see cookies
@@ -74,19 +82,75 @@ app.use(methodOverride('_method'));
 
 // }
 
+// This is the session configuration
 const sessionConfig = {
-    secret: 'thisshouldbeabettersecret',
-    resave: false,
-    saveUninitialized: false, // Save session only if modified
+    store: MongoStore.create({
+        mongoUrl: dbUrl, // Use your existing MongoDB connection string
+        touchAfter: 24 * 3600, // Lazy session update (24 hours)
+    }),
+    secret: 'thisshouldbeabettersecret', // Use your actual secret
+    resave: false, // Prevent unnecessary resaving
+    saveUninitialized: false, // Only save session when something is stored
     cookie: {
-        httpOnly: true,
+        name: 'session', // Session cookie name
+        httpOnly: true, // Prevent client-side access to the cookie
+        secure: false, // Set to true if using HTTPS
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 1 week expiration
         maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week in milliseconds
     }
 };
 
+// Error handling for MongoStore
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 3600,
+});
 
+store.on('error', function (error) {
+    console.error('Session store error:', error);
+});
+
+// Use the session with the proper configuration
 app.use(session(sessionConfig));
+
+
+//This is for mongostore
+// const sessionConfig = {
+//     store: MongoStore.create({
+//         mongoUrl: dbUrl, // Use your existing MongoDB connection string
+//         touchAfter: 24 * 3600 // Lazy session update, in seconds (24 hours in this case)
+//     }),
+//     secret: 'thisshouldbeabettersecret',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         name: 'session', // Use quotes around 'session' to avoid issues
+//         httpOnly: true,
+//         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 1 week expiration
+//         maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week in milliseconds
+//     }
+// };
+
+// // Log to see if the store is created
+// const store = MongoStore.create({
+//     mongoUrl: dbUrl,
+//     touchAfter: 24 * 3600,
+// });
+
+// store.on('error', function (error) {
+//     console.error('Session store error:', error);
+// });
+
+
+
+// // app.use(session(sessionConfig));
+// app.use(session({
+//     secret: 'yourSecret',
+//     resave: false, // Ensure session isn't resaved unnecessarily
+//     saveUninitialized: false, // Only save session when something is stored
+//     cookie: { secure: false } // Set secure: true if using HTTPS
+// }));
+
 
 app.use(flash());
 
@@ -143,15 +207,9 @@ app.use('/campgrounds', reviewRoutes);
 
 
 app.get('/', (req: Request, res: Response) => {
-    res.render('home', { title: 'Home' });
+    res.render('home', { title: 'Home', layout: false }); //layout false prevents express-ejs-layout
 });
 
-//delete this shit
-app.get('/fakeUser', async(req: Request, res: Response) => {
-    const user = new User({email: 'jgmaximum@gmail.com', username: 'arc'})
-    const newUser = await User.register(user, 'chicken');
-    res.send(newUser);
-})
 
 
 // express-session.d.ts
@@ -179,6 +237,12 @@ app.get('/check-session', (req: Request, res: Response) => {
 
 //MAKE SURE TO TURN BACK THESE ROUTES ON///
 
+// Error handling middleware
+app.use((err: ExpressError, req: Request, res: Response, next: NextFunction) => {
+    const {statusCode = 500, message = 'Something went wrong!'} = err;
+    res.status(statusCode).render('error', { title: 'Error Occured', message });
+});
+
 
 // app.use('*', (req: Request, res: Response, next: NextFunction) => {
 //     next(new ExpressError('Page not found', 404))
@@ -205,3 +269,4 @@ app.listen(3000, () => {
 //Joi not implemented
 //returnTo session not working
 //Duplicates in cloudinary made
+

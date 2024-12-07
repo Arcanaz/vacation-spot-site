@@ -1,0 +1,14 @@
+h3{
+    padding-bottom: 1rem;
+}
+
+.card {
+    padding: 30px; /* Existing padding */
+    border-radius: 10px; /* Existing border radius */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Existing shadow effect */
+    width: 100%; /* Take the full width of the column */
+    max-width: 600px; /* Increase max-width to 600px */
+    margin: 0 auto; /* Center the card horizontally */
+}
+
+

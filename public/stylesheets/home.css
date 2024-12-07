@@ -1,0 +1,46 @@
+body {
+    height: 100vh;
+    background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+    url("https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?q=80&w=2208&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    background-size: cover;
+    background-position: center;
+    text-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0.05rem 0.5rem rgba(0, 0, 0, 0.5);
+}
+
+.cover-container {
+    max-width: 60vw;
+}
+
+.nav-link {
+    padding: 0.25rem 0;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 1rem;
+    border-bottom: 0.25rem solid transparent;
+}
+
+.nav-link:hover {
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-secondary, .btn-secondary:hover {
+    color: #fff; /* White text */
+    background-color: #444; /* Dark background */
+    border-color: #666; /* Slightly lighter border */
+    text-shadow: none;
+    font-weight: 500;
+}
+
+.btn-secondary:hover {
+    background-color: #555; /* Slightly lighter on hover */
+    border-color: #777; /* Lighter border on hover */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.card {
+    padding: 30px; /* Optional: Add padding inside the card */
+    border-radius: 10px; /* Optional: Make corners round */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Optional: Shadow effect */
+}
