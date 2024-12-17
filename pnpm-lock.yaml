@@ -66,6 +66,9 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
     devDependencies:
+      '@flydotio/dockerfile':
+        specifier: ^0.5.9
+        version: 0.5.9
       '@types/connect-flash':
         specifier: ^0.0.40
         version: 0.0.40
@@ -114,6 +117,11 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@flydotio/dockerfile@0.5.9':
+    resolution: {integrity: sha512-ZPvMw9ABrE6W4nc92NL5Jy4XdAehldsU4LZ6pJP+H0sAqHqw3Bk9qKbMcjKJN1aM5AuKqfWm/I4ABGnkDjcqEw==}
+    engines: {node: '>=16.0.0'}
+    hasBin: true
 
   '@hapi/hoek@9.3.0':
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -504,6 +512,10 @@ packages:
 
   diff@4.0.2:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
+    engines: {node: '>=0.3.1'}
+
+  diff@5.2.0:
+    resolution: {integrity: sha512-uIFDxqpRZGZ6ThOk84hEfqWoHx2devRFvpTZcTHur85vImfaxUbTW9Ryh4CpCuDnToOP1CEtXKIgytHBPVff5A==}
     engines: {node: '>=0.3.1'}
 
   dir-glob@3.0.1:
@@ -1093,6 +1105,10 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
+  shell-quote@1.8.2:
+    resolution: {integrity: sha512-AzqKpGKjrj7EM6rKVQEPpB288oCfnrEIuyoT9cyF4nmGa7V8Zk6f7RRqYisX8X9m+Q7bd632aZW4ky7EhbQztA==}
+    engines: {node: '>= 0.4'}
+
   side-channel@1.0.6:
     resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}
     engines: {node: '>= 0.4'}
@@ -1292,6 +1308,14 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  '@flydotio/dockerfile@0.5.9':
+    dependencies:
+      chalk: 5.3.0
+      diff: 5.2.0
+      ejs: 3.1.10
+      shell-quote: 1.8.2
+      yargs: 17.7.2
 
   '@hapi/hoek@9.3.0': {}
 
@@ -1699,6 +1723,8 @@ snapshots:
   destroy@1.2.0: {}
 
   diff@4.0.2: {}
+
+  diff@5.2.0: {}
 
   dir-glob@3.0.1:
     dependencies:
@@ -2312,6 +2338,8 @@ snapshots:
       split-string: 3.1.0
 
   setprototypeof@1.2.0: {}
+
+  shell-quote@1.8.2: {}
 
   side-channel@1.0.6:
     dependencies:

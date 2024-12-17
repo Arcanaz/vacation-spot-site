@@ -53,6 +53,8 @@ const connectDB = async (): Promise<void> => {
 // export default connectDB;
 connectDB();
 
+const port = parseInt(process.env.PORT || "3000", 10); // This defaults to 3000
+ // Get port from environment variable, or default to 3000
 
 const app = express();
 
@@ -259,8 +261,9 @@ app.use((err: ExpressError, req: Request, res: Response, next: NextFunction) => 
 
 
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000')
+app.listen(port, '0.0.0.0', () => {
+    console.log(`EXPLICITLY SERVING on port ${port}`);
+    console.log(`Full port config: ${process.env.PORT}`);
 });
 
 

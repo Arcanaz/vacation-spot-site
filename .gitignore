@@ -15,6 +15,7 @@ node_modules/
 
 # Ignore OS-specific files
 .DS_Store
+Thumbs.db
 
 # Ignore TypeScript build files
 *.js
@@ -22,5 +23,17 @@ node_modules/
 
 # Ignore IDE and editor-specific files
 .vscode/
+.idea/
 *.swp
 *.swo
+.sublime-project
+.sublime-workspace
+
+# Ignore Docker-related files
+.docker/
+docker-compose.yml
+Dockerfile
+*.dockerignore
+
+# Ignore npm/yarn-related cache
+.npm/
