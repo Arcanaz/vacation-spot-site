@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Destination</title>
+</head>
+
+<body>
+    <div class="row">
+        <h1 class="text-center">New Destination</h1>
+        <div class="col-6 offset-3">
+            <form action="/destinations" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" type="text" id="title" name="destination[title]" required>
+                    <div class="invalid-feedback">
+                        Please enter a title.
+                    </div>
+                </div>
+
+                <!-- Price input with dollar sign -->
+                <div class="mb-3">
+                    <label class="form-label" for="price">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input class="form-control" type="number" id="price" name="destination[price]" required step="0.01">
+                    </div>
+                    <div class="invalid-feedback">
+                        Please enter a price.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="location">Location</label>
+                    <input class="form-control" type="text" id="location" name="destination[location]" required>
+                    <div class="invalid-feedback">
+                        Please enter a location.
+                    </div>
+                </div>
+
+                <!-- <div>
+                    <input type="file" name="destination[images]" id="" required multiple>
+                </div> -->
+
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" name="destination[images]" id="inputGroupFile02" multiple>
+                    <label class="input-group-text" for="inputGroupFile02">Upload</label>
+                </div>
+
+
+
+
+                <!-- <div class="mb-3">
+                    <label class="form-label" for="image">Image URL (optional)</label>
+                    <input class="form-control" type="text" id="imageURL" name="destination[image]">
+                </div> -->
+
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" id="description" name="destination[description]" rows="4" cols="50"
+                        required></textarea>
+                    <div class="invalid-feedback">
+                        Please enter a description.
+                    </div>
+                </div>
+
+                <!-- Align buttons side by side -->
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-primary" type="submit">Add Destinaton</button>
+                    <a class="btn btn-secondary" href="/destinations">Go back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <!-- Add your script here
+        <script>
+            document.querySelector('form').addEventListener('submit', function() {
+                console.log('Form submitted');
+            });
+        </script> -->
+
+        <script>
+            document.querySelector('form').addEventListener('submit', function(event) {
+                // Disable the submit button
+                const submitButton = event.target.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...'; // Optional: Change button text
+        
+                console.log('Form submitted');
+            });
+        </script>
+        
+</body>
+
+</html>
